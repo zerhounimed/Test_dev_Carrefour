@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign up {% endblock %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+
+    {% if editMode %}
+        <span>Modification</span>
+    {% else %}
+        <span>Inscription</span>
+    {% endif %}
+
+    <div>
+        {{ form_start(form) }}
+        {{ form_widget (form.username, {'attr': {'name': 'username'}}) }}
+        {{ form_widget(form.email, {'attr': {'name': 'email'}}) }}
+
+        {% if editMode==false %}
+        {{form_widget(form.password) , {'attr': {'name': 'passeword'}}) }}
+        {{form_widget(form.confirm_password)  }}
+        {% endif %}
+
+        <button type="submit" class="">
+            {% if editMode %}
+                Enregistrer les modifications
+            {% else %}
+                S'inscrire
+            {% endif %}
+        </button>
+
+        {{ form_end(form)}}
+
+        {% if editMode==false %}
+            <p style='text-align : center'> <a href="{{path('security_login')}}">Vous avez déjà un compte existant ? Connectez-vous !</a></p>
+        {% endif %}
+
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const form = document.querySelector("form");
+
+            form.addEventListener("submit", e => {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                fetch("/api/users", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email : formData.get("email"),
+                        username : formData.get("username"),
+                        passeword : formData.get("passeword"),
+                    })
+                })
+                    .then(res => res.json())
+                    .then(console.log)
+                    .catch(console.log);
+            })
+        });
+    </script>
+
+{% endblock %}

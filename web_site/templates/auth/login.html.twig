@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+
+{% block body %}
+
+    <form  action="{{path('security_login')}}" method="post">
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+
+        <div >
+            <input id="mail" name="email" class="input100" type="text" placeholder="username" required >
+            <span ></span>
+            <label for="mail">
+                <i class="fa fa-at" aria-hidden="true"></i>
+            </label>
+        </div>
+
+
+        <div >
+            <input id="mdp" name="password" class="input100" type="password" required  placeholder="Votre mot de passe">
+            <span ></span>
+            <label  for="mdp">
+                <i class="fa fa-lock" aria-hidden="true"></i>
+            </label>
+        </div>
+
+        <div >
+            <button type="submit" >Connexion</button>
+        </div>
+
+    </form>
+    <p style="text-align: center;">
+        <span>Première fois sur Bitcoin Price Trends ?</span>
+        <a href="{{path('security_registration')}}" title="accéder à la page d'inscription">Inscrivez-vous !</a>
+    </p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const form = document.querySelector("form");
+
+            form.addEventListener("submit", e => {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                fetch("/api/login_check", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: formData.get("email"),
+                        password: formData.get("password"),
+                    })
+                })
+                    .then(res => res.json())
+                    .then(({token}) => fetch("/session", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            name: 'token',
+                            data: token,
+                        })
+                    }))
+                    .then(console.log)
+                    .catch(console.log);
+            })
+        });
+    </script>
+{% endblock %}
